@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  topo-pypy:
+    build:
+      context: .
+      args:
+      - PYTHON_IMAGE=${PYPY_IMAGE_NAME}
+      - PYTHON_IMAGE_VERSION=${PYPY_IMAGE_VERSION}
+    image: lycantropos/topo-pypy:0.0.0
+    volumes:
+      - ./topo/:/opt/topo/topo/
+      - ./tests/:/opt/topo/tests/
+      - ./README.md:/opt/topo/README.md
+      - ./setup.py:/opt/topo/setup.py
+      - ./setup.cfg:/opt/topo/setup.cfg
+    entrypoint: pypy3
+    command: setup.py test
