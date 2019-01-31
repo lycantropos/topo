@@ -16,9 +16,9 @@ from typing import (Callable,
 
 from .base import (EMPTY_SET,
                    EMPTY_SET_STRING,
-                   DiscreteSet,
                    Set,
                    Union)
+from .discrete import DiscreteSet
 from .utils import generate_repr
 
 
