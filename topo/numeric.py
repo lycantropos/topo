@@ -195,16 +195,14 @@ class Interval(Set[SupportsFloat]):
             right_ends_inclusion = chain(repeat(False,
                                                 times=len(break_points)),
                                          [right_end_inclusive])
-            parts = [Interval(left_end, right_end,
+            parts = (Interval(left_end, right_end,
                               left_end_inclusive=left_end_inclusive,
                               right_end_inclusive=right_end_inclusive)
                      for (left_end, right_end,
                           left_end_inclusive,
                           right_end_inclusive) in zip(left_ends, right_ends,
                                                       left_ends_inclusion,
-                                                      right_ends_inclusion)]
-            if len(parts) == 1:
-                return parts[0]
+                                                      right_ends_inclusion))
             return Union(*parts)
         if not isinstance(other, Interval):
             return other.__rsub__(self)

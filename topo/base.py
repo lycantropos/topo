@@ -3,9 +3,9 @@ from abc import (ABC,
 from functools import reduce
 from itertools import repeat
 from operator import (and_,
-                      or_,
                       sub)
-from typing import (Generic,
+from typing import (FrozenSet,
+                    Generic,
                     Iterable)
 
 from .functional import flatmap
@@ -117,13 +117,17 @@ EMPTY_SET_STRING = str(EMPTY_SET)
 
 class Union(Set[Domain]):
     def __init__(self, *subsets: Set) -> None:
-        def flatten_set(set_: Set) -> Iterable[Set]:
-            if isinstance(set_, Union):
-                yield from flatmap(flatten_set, set_.subsets)
-            else:
-                yield set_
+        self._disperse = True
+        self._subsets = subsets
 
-        self.subsets = tuple(filter(None, flatmap(flatten_set, subsets)))
+    @property
+    def subsets(self) -> FrozenSet[Set]:
+        if self._disperse:
+            self._subsets = frozenset(compress(filter(None,
+                                                      flatmap(flatten_set,
+                                                              self._subsets))))
+            self._disperse = False
+        return self._subsets
 
     def __bool__(self) -> bool:
         return any(map(bool, self.subsets))
@@ -150,16 +154,14 @@ class Union(Set[Domain]):
             return NotImplemented
         if not other:
             return EMPTY_SET
-        intersections = map(and_, self.subsets, repeat(other))
-        return reduce(or_, intersections)
+        return Union(*map(and_, self.subsets, repeat(other)))
 
     def __or__(self, other: Set) -> Set:
         if not isinstance(other, Set):
             return NotImplemented
         if not other:
             return self
-        operands = map(or_, self.subsets, repeat(other))
-        return reduce(or_, operands)
+        return Union(*self.subsets, other)
 
     def __contains__(self, object_: Domain) -> bool:
         return any(object_ in subset
@@ -174,5 +176,29 @@ class Union(Set[Domain]):
     def __sub__(self, other: Set) -> Set:
         if not isinstance(other, Set):
             return NotImplemented
-        operands = map(sub, self.subsets, repeat(other))
-        return reduce(or_, operands)
+        return Union(*map(sub, self.subsets, repeat(other)))
+
+
+def compress(sets: Iterable[Set]) -> Iterable[Set]:
+    sets = list(flatmap(flatten_set, sets))
+    while True:
+        try:
+            set_ = sets.pop()
+        except IndexError:
+            break
+        for index, rest_set in enumerate(sets):
+            union = set_ | rest_set
+            if isinstance(union, Union):
+                continue
+            else:
+                sets[index] = union
+                break
+        else:
+            yield set_
+
+
+def flatten_set(set_: Set) -> Iterable[Set]:
+    if isinstance(set_, Union):
+        yield from flatmap(flatten_set, set_.subsets)
+    else:
+        yield set_
