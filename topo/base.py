@@ -137,7 +137,7 @@ class Union(Set[Domain]):
     def __and__(self, other: Set) -> Set:
         if not isinstance(other, Set):
             return NotImplemented
-        if not other:
+        if not (self or other):
             return EMPTY_SET
         return Union(*map(and_, self.subsets, repeat(other)))
 
@@ -155,6 +155,10 @@ class Union(Set[Domain]):
     def __rsub__(self, other: Set) -> Set:
         if not isinstance(other, Set):
             return NotImplemented
+        if not self:
+            return other
+        if not other:
+            return EMPTY_SET
         operands = map(sub, repeat(other), self.subsets)
         return reduce(and_, operands)
 
