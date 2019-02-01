@@ -80,9 +80,10 @@ class Interval(Set[SupportsFloat]):
         if not isinstance(other, Interval):
             return other & self
 
+        if not self.intersects_with_interval(other):
+            return EMPTY_SET
+
         if self.left_end < other.left_end:
-            if self.right_end not in other:
-                return EMPTY_SET
             left_end = other.left_end
             left_end_inclusive = other.left_end_inclusive
         elif self.left_end == other.left_end:
@@ -90,8 +91,6 @@ class Interval(Set[SupportsFloat]):
             left_end_inclusive = min(self.left_end_inclusive,
                                      other.left_end_inclusive)
         else:
-            if other.right_end not in self:
-                return EMPTY_SET
             left_end = self.left_end
             left_end_inclusive = self.left_end_inclusive
 
@@ -213,6 +212,15 @@ class Interval(Set[SupportsFloat]):
                           left_end_inclusive=not other.right_end_inclusive,
                           right_end_inclusive=self.right_end_inclusive)]
         return reduce(or_, parts)
+
+    def intersects_with_interval(self, other: 'Interval') -> bool:
+        if self.left_end < other.left_end:
+            operator = self.operators_by_inclusion[self.right_end_inclusive]
+            return operator(other.left_end, self.right_end)
+        elif self.left_end > other.left_end:
+            operator = self.operators_by_inclusion[self.left_end_inclusive]
+            return operator(self.left_end, other.right_end)
+        return True
 
 
 OpenInterval = cast(Callable[[SupportsFloat, SupportsFloat], Interval],
