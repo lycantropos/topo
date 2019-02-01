@@ -210,13 +210,17 @@ class Interval(Set[SupportsFloat]):
             return Union(*parts)
         if not isinstance(other, Interval):
             return other.__rsub__(self)
-        parts = [Interval(self.left_end, other.left_end,
-                          left_end_inclusive=self.left_end_inclusive,
-                          right_end_inclusive=not other.left_end_inclusive),
-                 Interval(other.right_end, self.right_end,
-                          left_end_inclusive=not other.right_end_inclusive,
-                          right_end_inclusive=self.right_end_inclusive)]
-        return reduce(or_, parts)
+
+        if not self.intersects_with_interval(other):
+            return self
+
+        return Union(
+                Interval(self.left_end, other.left_end,
+                         left_end_inclusive=self.left_end_inclusive,
+                         right_end_inclusive=not other.left_end_inclusive),
+                Interval(other.right_end, self.right_end,
+                         left_end_inclusive=not other.right_end_inclusive,
+                         right_end_inclusive=self.right_end_inclusive))
 
     def intersects_with_interval(self, other: 'Interval') -> bool:
         if self.left_end < other.left_end:
