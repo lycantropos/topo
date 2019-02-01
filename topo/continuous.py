@@ -145,6 +145,9 @@ class Interval(Set[SupportsFloat]):
         if not isinstance(other, Interval):
             return other | self
 
+        if not self.intersects_with_interval(other):
+            return Union(self, other)
+
         def by_left_end_sorting_key(interval: Interval
                                     ) -> Tuple[SupportsFloat, bool]:
             return interval.left_end, not interval.left_end_inclusive
@@ -153,10 +156,8 @@ class Interval(Set[SupportsFloat]):
                                      ) -> Tuple[SupportsFloat, bool]:
             return interval.right_end, interval.right_end_inclusive
 
-        left_interval, right_interval = sorted([self, other],
-                                               key=by_left_end_sorting_key)
-        if left_interval.right_end < right_interval.left_end:
-            return Union(left_interval, right_interval)
+        left_interval = min(self, other,
+                            key=by_left_end_sorting_key)
         right_interval = max(self, other,
                              key=by_right_end_sorting_key)
         return Interval(left_interval.left_end, right_interval.right_end,
