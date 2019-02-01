@@ -166,7 +166,13 @@ class Interval(Set[SupportsFloat]):
         if not isinstance(other, Set):
             return NotImplemented
         if isinstance(other, DiscreteSet):
-            break_points = sorted(filter(self.__contains__, other.points))
+            def to_real_part(number: Number) -> SupportsFloat:
+                if not isinstance(number, Complex):
+                    return number
+                return number.real
+
+            break_points = sorted(map(to_real_part, filter(self.__contains__,
+                                                           other.points)))
             if not break_points:
                 return self
             first_excluded_number = break_points[0]
