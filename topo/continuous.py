@@ -9,7 +9,8 @@ from numbers import (Complex,
 from operator import (le,
                       lt,
                       or_)
-from typing import (Callable,
+from typing import (Any,
+                    Callable,
                     SupportsFloat,
                     Tuple,
                     cast)
@@ -109,7 +110,7 @@ class Interval(Set[SupportsFloat]):
                         left_end_inclusive=left_end_inclusive,
                         right_end_inclusive=right_end_inclusive)
 
-    def __contains__(self, object_: SupportsFloat) -> bool:
+    def __contains__(self, object_: Any) -> bool:
         if not isinstance(object_, Number):
             return False
         if isinstance(object_, Complex):
