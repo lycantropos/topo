@@ -47,6 +47,8 @@ class Set(ABC, Generic[Domain]):
         pass
 
     def __eq__(self, other: 'Set') -> bool:
+        if not self:
+            return not other
         return not (self - other) and not (other - self)
 
     def __rsub__(self, other: 'Set') -> 'Set':
