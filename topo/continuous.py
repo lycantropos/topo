@@ -132,8 +132,10 @@ class Interval(Set[SupportsFloat]):
     def __eq__(self, other: Set) -> bool:
         if not isinstance(other, Set):
             return NotImplemented
-        if not isinstance(other, Interval):
+        if isinstance(other, DiscreteSet):
             return False
+        if not isinstance(other, Interval):
+            return other == self
         return (self.left_end == other.left_end
                 and self.left_end_inclusive == other.left_end_inclusive
                 and self.right_end == other.right_end
