@@ -105,11 +105,6 @@ class Interval(Set[SupportsFloat]):
             right_end = other.right_end
             right_end_inclusive = other.right_end_inclusive
 
-        if left_end == right_end:
-            if left_end_inclusive and right_end_inclusive:
-                return DiscreteSet(left_end)
-            return DiscreteSet()
-
         return Interval(left_end, right_end,
                         left_end_inclusive=left_end_inclusive,
                         right_end_inclusive=right_end_inclusive)
