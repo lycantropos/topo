@@ -1,14 +1,12 @@
 import math
 from decimal import Decimal
-from functools import (partial,
-                       reduce)
+from functools import partial
 from itertools import (chain,
                        repeat)
 from numbers import (Complex,
                      Number)
 from operator import (le,
-                      lt,
-                      or_)
+                      lt)
 from typing import (Any,
                     Callable,
                     SupportsFloat,
