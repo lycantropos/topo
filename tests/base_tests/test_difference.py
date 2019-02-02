@@ -7,7 +7,7 @@ def test_difference_subtrahend(set_: Set,
                                another_set: Set) -> None:
     result = set_ - (other_set - another_set)
 
-    assert result == (set_ & other_set) | (set_ & another_set)
+    assert result == (set_ - other_set) | (set_ & another_set)
 
 
 def test_empty_set_minuend(set_: Set) -> None:
@@ -51,12 +51,6 @@ def test_union_subtrahend(set_: Set,
     result = set_ - (other_set | another_set)
 
     assert result == (set_ - other_set) & (set_ - another_set)
-
-
-def test_inversion_by_union(set_: Set, other_set: Set) -> None:
-    result = (set_ - other_set) | other_set
-
-    assert result == set_
 
 
 def test_self_difference(set_: Set) -> None:
