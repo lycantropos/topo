@@ -105,14 +105,12 @@ EMPTY_SET = EmptySet()
 class Union(Set[Domain]):
     def __init__(self, *subsets: Set) -> None:
         self._disperse = True
-        self._subsets = subsets
+        self._subsets = frozenset(filter(None, flatmap(flatten_set, subsets)))
 
     @property
     def subsets(self) -> FrozenSet[Set]:
         if self._disperse:
-            self._subsets = frozenset(compress(filter(None,
-                                                      flatmap(flatten_set,
-                                                              self._subsets))))
+            self._subsets = frozenset(compress(self._subsets))
             self._disperse = False
         return self._subsets
 
@@ -179,13 +177,15 @@ def compress(sets: Iterable[Set]) -> Iterable[Set]:
             break
         for index, rest_set in enumerate(sets):
             union = set_ | rest_set
-            if isinstance(union, Union):
+            if (isinstance(union, Union)
+                    and set_ in union._subsets
+                    and rest_set in union._subsets):
                 continue
             else:
                 sets[index] = union
                 break
         else:
-            yield set_
+            yield from flatten_set(set_)
 
 
 def flatten_set(set_: Set) -> Iterable[Set]:
