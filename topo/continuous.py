@@ -243,10 +243,14 @@ class Interval(Set[SupportsFloat]):
 
     def intersects_with_interval(self, other: 'Interval') -> bool:
         if self.left_end < other.left_end:
-            operator = self.operators_by_inclusion[self.right_end_inclusive]
+            inclusion = (self.right_end_inclusive
+                         and other.left_end_inclusive)
+            operator = self.operators_by_inclusion[inclusion]
             return operator(other.left_end, self.right_end)
         elif self.left_end > other.left_end:
-            operator = self.operators_by_inclusion[self.left_end_inclusive]
+            inclusion = (self.left_end_inclusive
+                         and other.right_end_inclusive)
+            operator = self.operators_by_inclusion[inclusion]
             return operator(self.left_end, other.right_end)
         return True
 
