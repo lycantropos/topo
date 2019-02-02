@@ -56,6 +56,84 @@ Install:
   pypy setup.py install
   ```
 
+Usage
+-----
+
+`topo` provides next models & objects:
+
+- `EMPTY_SET`: for set with no elements
+    ```python
+    >>> from topo.base import EMPTY_SET
+    >>> EMPTY_SET
+    EmptySet()
+    >>> str(EMPTY_SET)
+    '{}'
+    >>> 1 in EMPTY_SET
+    False
+    # and so on for every object
+    ```
+- `DiscreteSet`: for discrete sets of hashable objects 
+(similar to built-in `set`s)
+    ```python
+    >>> from topo.discrete import DiscreteSet
+    >>> binary_set = DiscreteSet(0, 1)
+    >>> binary_set
+    DiscreteSet(0, 1)
+    >>> str(binary_set)
+    '{0, 1}'
+    >>> 0 in binary_set
+    True
+    >>> 10 in binary_set
+    False
+    ```
+- `Interval`: for intervals of floating point numbers
+    ```python
+    >>> from topo.continuous import Interval
+    >>> unit_segment = Interval(0, 1)
+    >>> unit_segment
+    Interval(0, 1, left_end_inclusive=True, right_end_inclusive=True)
+    >>> str(unit_segment)
+    '[0, 1]'
+    >>> 0.5 in unit_segment
+    True
+    >>> 10 in unit_segment
+    False
+    ```
+
+with next operators overloaded:
+
+- `|`: for sets union
+    ```python
+    >>> unit_segment | binary_set
+    Interval(0, 1, left_end_inclusive=True, right_end_inclusive=True)
+    ```
+    since `unit_segment` contains `binary_set` elements.
+
+- `-`: for sets difference
+    ```python
+    >>> unit_segment - binary_set
+    Interval(0, 1, left_end_inclusive=False, right_end_inclusive=False)
+    ```
+    as we can see both ends were excluded.
+
+- `&`: for sets intersection
+    ```python
+    >>> unit_segment & binary_set
+    DiscreteSet(0, 1)
+    ```
+
+Also used in conditionals sets will evaluate to `False` 
+if they are considered empty and `True` otherwise:
+
+```python
+>>> if not EMPTY_SET:
+        print('Hello World!')
+    else:
+        print('Something went wrong.')
+Hello World!
+```
+            
+
 Development
 -----------
 
