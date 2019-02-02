@@ -34,3 +34,7 @@ def find(strategy: SearchStrategy[Domain]) -> Domain:
             raise unpacking_error from search_error
         else:
             return result
+
+
+def implication(antecedent: bool, consequent: bool) -> bool:
+    return not antecedent or consequent
