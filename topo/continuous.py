@@ -143,7 +143,7 @@ class Interval(Set[SupportsFloat]):
         if not isinstance(other, Interval):
             return other | self
 
-        if not self.intersects_with_interval(other):
+        if not self.merges_with_interval(other):
             return Union(self, other)
 
         def by_left_end_sorting_key(interval: Interval
@@ -221,6 +221,25 @@ class Interval(Set[SupportsFloat]):
                 Interval(other.right_end, self.right_end,
                          left_end_inclusive=not other.right_end_inclusive,
                          right_end_inclusive=self.right_end_inclusive))
+
+    def merges_with_interval(self, other: 'Interval') -> bool:
+        if self.left_end < other.left_end:
+            if self.right_end == other.left_end:
+                return (self.right_end_inclusive
+                        or other.left_end_inclusive)
+            elif self.right_end > other.left_end:
+                return True
+            else:
+                return False
+        elif self.left_end > other.left_end:
+            if other.right_end == self.left_end:
+                return (self.left_end_inclusive
+                        or other.right_end_inclusive)
+            elif other.right_end > self.left_end:
+                return True
+            else:
+                return False
+        return True
 
     def intersects_with_interval(self, other: 'Interval') -> bool:
         if self.left_end < other.left_end:
