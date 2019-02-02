@@ -103,6 +103,14 @@ EMPTY_SET = EmptySet()
 
 
 class Union(Set[Domain]):
+    def __new__(cls, *subsets: Set) -> Set:
+        subsets = set(filter(None, flatmap(flatten_set, subsets)))
+        if not subsets:
+            return EMPTY_SET
+        if len(subsets) == 1:
+            return subsets.pop()
+        return super().__new__(cls)
+
     def __init__(self, *subsets: Set) -> None:
         self._disperse = True
         self._subsets = frozenset(filter(None, flatmap(flatten_set, subsets)))
