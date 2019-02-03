@@ -57,6 +57,9 @@ class Set(ABC, Generic[Domain]):
     def __xor__(self, other: 'Set') -> 'Set':
         return (self | other) - (self & other)
 
+    def unfold(self) -> Iterable['Set']:
+        yield self
+
 
 EMPTY_SET_STRING = '{}'
 
@@ -103,17 +106,9 @@ EMPTY_SET = EmptySet()
 
 
 class Union(Set[Domain]):
-    def __new__(cls, *subsets: Set) -> Set:
-        subsets = set(filter(None, flatmap(flatten_set, subsets)))
-        if not subsets:
-            return EMPTY_SET
-        if len(subsets) == 1:
-            return subsets.pop()
-        return super().__new__(cls)
-
     def __init__(self, *subsets: Set) -> None:
         self._disperse = True
-        self._subsets = frozenset(filter(None, flatmap(flatten_set, subsets)))
+        self._subsets = frozenset(filter(None, flatmap(Set.unfold, subsets)))
 
     @property
     def subsets(self) -> FrozenSet[Set]:
@@ -147,14 +142,16 @@ class Union(Set[Domain]):
             return NotImplemented
         if not (self or other):
             return EMPTY_SET
-        return Union(*map(and_, self.subsets, repeat(other)))
+        return (Union(*map(and_, self.subsets, repeat(other)))
+                .fold())
 
     def __or__(self, other: Set) -> Set:
         if not isinstance(other, Set):
             return NotImplemented
         if not other:
             return self
-        return Union(*self.subsets, other)
+        return (Union(*self.subsets, other)
+                .fold())
 
     def __contains__(self, object_: Domain) -> bool:
         return any(object_ in subset
@@ -173,11 +170,23 @@ class Union(Set[Domain]):
     def __sub__(self, other: Set) -> Set:
         if not isinstance(other, Set):
             return NotImplemented
-        return Union(*map(sub, self.subsets, repeat(other)))
+        return (Union(*map(sub, self.subsets, repeat(other)))
+                .fold())
+
+    def fold(self) -> Set:
+        subsets = self.subsets
+        if not subsets:
+            return EMPTY_SET
+        if len(subsets) == 1:
+            return list(subsets)[0]
+        return self
+
+    def unfold(self) -> Iterable[Set]:
+        yield from flatmap(Set.unfold, self.subsets)
 
 
 def compress(sets: Iterable[Set]) -> Iterable[Set]:
-    sets = list(flatmap(flatten_set, sets))
+    sets = list(flatmap(Set.unfold, sets))
     while True:
         try:
             set_ = sets.pop()
@@ -193,11 +202,4 @@ def compress(sets: Iterable[Set]) -> Iterable[Set]:
                 sets[index] = union
                 break
         else:
-            yield from flatten_set(set_)
-
-
-def flatten_set(set_: Set) -> Iterable[Set]:
-    if isinstance(set_, Union):
-        yield from flatmap(flatten_set, set_.subsets)
-    else:
-        yield set_
+            yield from set_.unfold()
