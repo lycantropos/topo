@@ -2,6 +2,7 @@ import math
 from decimal import Decimal
 from functools import partial
 from itertools import (chain,
+                       filterfalse,
                        repeat)
 from numbers import (Complex,
                      Number)
@@ -138,6 +139,23 @@ class Interval(Set[SupportsFloat]):
     def __or__(self, other: Set) -> Set:
         if not isinstance(other, Set):
             return NotImplemented
+
+        if isinstance(other, DiscreteSet):
+            left_end = self.left_end
+            left_end_inclusive = self.left_end_inclusive
+            if left_end in other:
+                left_end_inclusive = True
+            right_end = self.right_end
+            right_end_inclusive = self.right_end_inclusive
+            if right_end in other:
+                right_end_inclusive = True
+            merged_interval = Interval(left_end, right_end,
+                                       left_end_inclusive=left_end_inclusive,
+                                       right_end_inclusive=right_end_inclusive)
+            extra_points = filterfalse(merged_interval.__contains__,
+                                       other.points)
+            return Union(merged_interval, DiscreteSet(*extra_points))
+
         if not isinstance(other, Interval):
             return other | self
 

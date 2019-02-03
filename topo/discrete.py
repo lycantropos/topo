@@ -1,5 +1,4 @@
-from .base import (Set,
-                   Union)
+from .base import Set
 from .hints import Domain
 from .utils import generate_repr
 
@@ -41,12 +40,7 @@ class DiscreteSet(Set[Domain]):
         if not isinstance(other, Set):
             return NotImplemented
         if not isinstance(other, DiscreteSet):
-            extra_points = [point
-                            for point in self.points
-                            if point not in other]
-            if not extra_points:
-                return other
-            return Union(DiscreteSet(*extra_points), other)
+            return other | self
         return DiscreteSet(*self.points, *other.points)
 
     def __sub__(self, other: Set) -> Set:
