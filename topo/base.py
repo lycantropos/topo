@@ -47,6 +47,8 @@ class Set(ABC, Generic[Domain]):
         pass
 
     def __eq__(self, other: 'Set') -> bool:
+        if not isinstance(other, Set):
+            return NotImplemented
         if not self:
             return not other
         return not (self - other) and not (other - self)
@@ -131,8 +133,6 @@ class Union(Set[Domain]):
         return ' or '.join(map(str, self.subsets))
 
     def __eq__(self, other: Set) -> bool:
-        if not isinstance(other, Set):
-            return NotImplemented
         if not isinstance(other, Union):
             return super().__eq__(other)
         return self.subsets == other.subsets

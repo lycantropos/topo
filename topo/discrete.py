@@ -30,8 +30,6 @@ class DiscreteSet(Set[Domain]):
         return object_ in self.points
 
     def __eq__(self, other: Set) -> bool:
-        if not isinstance(other, Set):
-            return NotImplemented
         if not isinstance(other, DiscreteSet):
             return super().__eq__(other)
         return self.points == other.points

@@ -129,6 +129,8 @@ class Interval(Set[SupportsFloat]):
             return NotImplemented
         if isinstance(other, DiscreteSet):
             return False
+        if isinstance(other, Union):
+            return other.fold() == self
         if not isinstance(other, Interval):
             return other == self
         return (self.left_end == other.left_end
@@ -181,6 +183,7 @@ class Interval(Set[SupportsFloat]):
     def __sub__(self, other: Set) -> Set:
         if not isinstance(other, Set):
             return NotImplemented
+
         if isinstance(other, DiscreteSet):
             def to_real_part(number: Number) -> SupportsFloat:
                 if not isinstance(number, Complex):
@@ -224,6 +227,7 @@ class Interval(Set[SupportsFloat]):
                                                       left_ends_inclusion,
                                                       right_ends_inclusion))
             return Union(*parts).fold()
+
         if not isinstance(other, Interval):
             return other.__rsub__(self)
 
