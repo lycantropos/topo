@@ -59,7 +59,13 @@ Install:
 Usage
 -----
 
-`topo` provides next models & objects:
+`topo` provides
+
+- hashable,
+- partially ordered by `<=` ("is subset of") and `>=` ("is superset of") relations,
+- strictly ordered by `<` ("is strict subset of") and `>` ("is strict superset of") relations
+
+models & objects:
 
 - `EMPTY_SET`: for set with no elements
     ```python
@@ -68,6 +74,10 @@ Usage
     EmptySet()
     >>> str(EMPTY_SET)
     '{}'
+    >>> EMPTY_SET <= EMPTY_SET
+    True
+    >>> EMPTY_SET < EMPTY_SET
+    False
     >>> 1 in EMPTY_SET
     False
     # and so on for every object
@@ -81,6 +91,10 @@ Usage
     DiscreteSet(0, 1)
     >>> str(binary_set)
     '{0, 1}'
+    >>> EMPTY_SET <= binary_set
+    True
+    >>> binary_set < EMPTY_SET
+    False
     >>> 0 in binary_set
     True
     >>> 10 in binary_set
@@ -94,6 +108,10 @@ Usage
     Interval(0, 1, left_end_inclusive=True, right_end_inclusive=True)
     >>> str(unit_segment)
     '[0, 1]'
+    >>> binary_set <= unit_segment
+    True
+    >>> unit_segment < binary_set
+    False
     >>> 0.5 in unit_segment
     True
     >>> 10 in unit_segment
