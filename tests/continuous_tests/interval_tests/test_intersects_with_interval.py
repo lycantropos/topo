@@ -3,13 +3,9 @@ from topo.continuous import Interval
 
 
 def test_reflexivity(interval: Interval) -> None:
-    result = interval.intersects_with_interval(interval)
-
-    assert result
+    assert interval.intersects_with_interval(interval)
 
 
 def test_symmetry(interval: Interval, other_interval: Interval) -> None:
-    result = interval.intersects_with_interval(other_interval)
-
-    assert implication(result,
+    assert implication(interval.intersects_with_interval(other_interval),
                        other_interval.intersects_with_interval(interval))
