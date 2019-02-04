@@ -53,6 +53,26 @@ class Set(ABC, Generic[Domain]):
             return not other
         return not (self - other) and not (other - self)
 
+    def __ge__(self, other: 'Set') -> bool:
+        if not isinstance(other, Set):
+            return NotImplemented
+        return self & other == other
+
+    def __gt__(self, other: 'Set') -> bool:
+        if not isinstance(other, Set):
+            return NotImplemented
+        return self >= other and self != other
+
+    def __le__(self, other: 'Set') -> bool:
+        if not isinstance(other, Set):
+            return NotImplemented
+        return self & other == self
+
+    def __lt__(self, other: 'Set') -> bool:
+        if not isinstance(other, Set):
+            return NotImplemented
+        return self <= other and self != other
+
     def __rsub__(self, other: 'Set') -> 'Set':
         return NotImplemented
 
@@ -91,6 +111,26 @@ class EmptySet(Set[Domain]):
         if not isinstance(other, Set):
             return NotImplemented
         return not other
+
+    def __ge__(self, other: Set) -> bool:
+        if not isinstance(other, Set):
+            return NotImplemented
+        return not other
+
+    def __gt__(self, other: Set) -> bool:
+        if not isinstance(other, Set):
+            return NotImplemented
+        return False
+
+    def __le__(self, other: Set) -> bool:
+        if not isinstance(other, Set):
+            return NotImplemented
+        return True
+
+    def __lt__(self, other: Set) -> bool:
+        if not isinstance(other, Set):
+            return NotImplemented
+        return bool(other)
 
     def __or__(self, other: Set) -> Set:
         if not isinstance(other, Set):
@@ -132,11 +172,6 @@ class Union(Set[Domain]):
             return EMPTY_SET_STRING
         return ' or '.join(map(str, self.subsets))
 
-    def __eq__(self, other: Set) -> bool:
-        if not isinstance(other, Union):
-            return super().__eq__(other)
-        return self.subsets == other.subsets
-
     def __and__(self, other: Set) -> Set:
         if not isinstance(other, Set):
             return NotImplemented
@@ -144,6 +179,24 @@ class Union(Set[Domain]):
             return EMPTY_SET
         return (Union(*map(and_, self.subsets, repeat(other)))
                 .fold())
+
+    def __eq__(self, other: Set) -> bool:
+        if not isinstance(other, Union):
+            return super().__eq__(other)
+        return self.subsets == other.subsets
+
+    def __ge__(self, other: Set) -> bool:
+        if not self:
+            return not other
+        if not isinstance(other, Union):
+            return any(subset >= other
+                       for subset in self.subsets)
+        return all(self >= subset
+                   for subset in other.subsets)
+
+    def __le__(self, other: Set) -> bool:
+        return all(subset <= other
+                   for subset in self.subsets)
 
     def __or__(self, other: Set) -> Set:
         if not isinstance(other, Set):

@@ -34,6 +34,29 @@ class DiscreteSet(Set[Domain]):
             return super().__eq__(other)
         return self.points == other.points
 
+    def __ge__(self, other: Set) -> bool:
+        if not isinstance(other, DiscreteSet):
+            return super().__ge__(other)
+        return self.points >= other.points
+
+    def __gt__(self, other: Set) -> bool:
+        if not isinstance(other, DiscreteSet):
+            return super().__gt__(other)
+        return self.points > other.points
+
+    def __le__(self, other: Set) -> bool:
+        if not isinstance(other, Set):
+            return NotImplemented
+        if not isinstance(other, DiscreteSet):
+            return all(point in other
+                       for point in self.points)
+        return self.points <= other.points
+
+    def __lt__(self, other: Set) -> bool:
+        if not isinstance(other, DiscreteSet):
+            return super().__lt__(other)
+        return self.points < other.points
+
     def __or__(self, other: Set) -> Set:
         if not isinstance(other, Set):
             return NotImplemented

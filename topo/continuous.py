@@ -138,6 +138,27 @@ class Interval(Set[SupportsFloat]):
                 and self.right_end == other.right_end
                 and self.right_end_inclusive == other.right_end_inclusive)
 
+    def __ge__(self, other: Set) -> bool:
+        if isinstance(other, DiscreteSet):
+            return all(point in self
+                       for point in other.points)
+        if isinstance(other, Union):
+            return all(self >= subset
+                       for subset in other.subsets)
+        if not isinstance(other, Interval):
+            return super().__ge__(other)
+        return self.contains_interval(other)
+
+    def __le__(self, other: Set) -> bool:
+        if isinstance(other, DiscreteSet):
+            return False
+        if isinstance(other, Union):
+            return any(self <= subset
+                       for subset in other.subsets)
+        if not isinstance(other, Interval):
+            return super().__le__(other)
+        return other.contains_interval(self)
+
     def __or__(self, other: Set) -> Set:
         if not isinstance(other, Set):
             return NotImplemented
@@ -243,6 +264,29 @@ class Interval(Set[SupportsFloat]):
                          right_end_inclusive=self.right_end_inclusive))
                 .fold())
 
+    def contains_interval(self, other: 'Interval') -> bool:
+        left_inclusion = (self.left_end_inclusive
+                          or not other.left_end_inclusive)
+        right_inclusion = (self.right_end_inclusive
+                           or not other.right_end_inclusive)
+        left_operator = other.operators_by_inclusion[left_inclusion]
+        right_operator = other.operators_by_inclusion[right_inclusion]
+        return (left_operator(self.left_end, other.left_end)
+                and right_operator(other.right_end, self.right_end))
+
+    def intersects_with_interval(self, other: 'Interval') -> bool:
+        if self.left_end < other.left_end:
+            inclusion = (self.right_end_inclusive
+                         and other.left_end_inclusive)
+            operator = self.operators_by_inclusion[inclusion]
+            return operator(other.left_end, self.right_end)
+        elif self.left_end > other.left_end:
+            inclusion = (self.left_end_inclusive
+                         and other.right_end_inclusive)
+            operator = self.operators_by_inclusion[inclusion]
+            return operator(self.left_end, other.right_end)
+        return True
+
     def merges_with_interval(self, other: 'Interval') -> bool:
         if self.left_end < other.left_end:
             if self.right_end == other.left_end:
@@ -260,19 +304,6 @@ class Interval(Set[SupportsFloat]):
                 return True
             else:
                 return False
-        return True
-
-    def intersects_with_interval(self, other: 'Interval') -> bool:
-        if self.left_end < other.left_end:
-            inclusion = (self.right_end_inclusive
-                         and other.left_end_inclusive)
-            operator = self.operators_by_inclusion[inclusion]
-            return operator(other.left_end, self.right_end)
-        elif self.left_end > other.left_end:
-            inclusion = (self.left_end_inclusive
-                         and other.right_end_inclusive)
-            operator = self.operators_by_inclusion[inclusion]
-            return operator(self.left_end, other.right_end)
         return True
 
 
