@@ -13,3 +13,8 @@ def interval() -> Interval:
 @pytest.fixture(scope='function')
 def other_interval() -> Interval:
     return find(strategies.intervals)
+
+
+@pytest.fixture(scope='function')
+def another_interval() -> Interval:
+    return find(strategies.intervals)
