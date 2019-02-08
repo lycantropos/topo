@@ -12,6 +12,10 @@ def test_connection_with_intersection(set_: Set, other_set: Set) -> None:
     assert equivalence(set_ >= other_set, set_ & other_set == other_set)
 
 
+def test_connection_with_subset_relation(set_: Set, other_set: Set) -> None:
+    assert equivalence(set_ >= other_set, other_set <= set_)
+
+
 def test_connection_with_union(set_: Set, other_set: Set) -> None:
     assert equivalence(set_ >= other_set, set_ | other_set == set_)
 

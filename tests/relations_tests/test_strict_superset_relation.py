@@ -1,4 +1,5 @@
-from tests.utils import implication
+from tests.utils import (equivalence,
+                         implication)
 from topo.base import Set
 
 
@@ -8,6 +9,11 @@ def test_asymmetry(set_: Set, other_set: Set) -> None:
 
 def test_connection_with_superset_relation(set_: Set, other_set: Set) -> None:
     assert implication(set_ > other_set, set_ >= other_set)
+
+
+def test_connection_with_strict_subset_relation(set_: Set,
+                                                other_set: Set) -> None:
+    assert equivalence(set_ > other_set, other_set < set_)
 
 
 def test_irreflexivity(set_: Set) -> None:
