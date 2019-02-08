@@ -16,10 +16,17 @@ from .utils import generate_repr
 class Set(ABC, Generic[Domain]):
     @abstractmethod
     def __bool__(self) -> bool:
+        """
+        Evaluates to ``True`` if set is not empty and ``False`` otherwise.
+        """
         pass
 
     @abstractmethod
     def __hash__(self) -> int:
+        """
+        All sets considered hashable (e.g. for using as ``dict`` keys)
+        and as a consequence should not be mutated after creation.
+        """
         pass
 
     @abstractmethod
@@ -32,21 +39,36 @@ class Set(ABC, Generic[Domain]):
 
     @abstractmethod
     def __and__(self, other: 'Set') -> 'Set':
+        """
+        Intersects with given set.
+        """
         pass
 
     @abstractmethod
     def __contains__(self, object_: Domain) -> bool:
+        """
+        Checks membership of given object.
+        """
         pass
 
     @abstractmethod
     def __or__(self, other: 'Set') -> 'Set':
+        """
+        Unites with given set.
+        """
         pass
 
     @abstractmethod
     def __sub__(self, other: 'Set') -> 'Set':
+        """
+        Subtracts given set.
+        """
         pass
 
     def __eq__(self, other: 'Set') -> bool:
+        """
+        Checks equality with given set.
+        """
         if not isinstance(other, Set):
             return NotImplemented
         if not self:
@@ -54,21 +76,33 @@ class Set(ABC, Generic[Domain]):
         return not (self - other) and not (other - self)
 
     def __ge__(self, other: 'Set') -> bool:
+        """
+        Checks if set is superset of given set.
+        """
         if not isinstance(other, Set):
             return NotImplemented
         return self & other == other
 
     def __gt__(self, other: 'Set') -> bool:
+        """
+        Checks if set is strict superset of given set.
+        """
         if not isinstance(other, Set):
             return NotImplemented
         return self >= other and self != other
 
     def __le__(self, other: 'Set') -> bool:
+        """
+        Checks if set is subset of given set.
+        """
         if not isinstance(other, Set):
             return NotImplemented
         return self & other == self
 
     def __lt__(self, other: 'Set') -> bool:
+        """
+        Checks if set is strict subset of given set.
+        """
         if not isinstance(other, Set):
             return NotImplemented
         return self <= other and self != other
@@ -77,9 +111,15 @@ class Set(ABC, Generic[Domain]):
         return NotImplemented
 
     def __xor__(self, other: 'Set') -> 'Set':
+        """
+        Symmetrically subtracts given set.
+        """
         return (self | other) - (self & other)
 
     def unfold(self) -> Iterable['Set']:
+        """
+        Returns disjunctive subsets.
+        """
         yield self
 
 
@@ -227,6 +267,9 @@ class Union(Set[Domain]):
                 .fold())
 
     def fold(self) -> Set:
+        """
+        Flattens union if possible.
+        """
         subsets = self.subsets
         if not subsets:
             return EMPTY_SET
