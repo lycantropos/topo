@@ -8,9 +8,10 @@ from typing import (FrozenSet,
                     Generic,
                     Iterable)
 
+from reprit.base import generate_repr
+
 from .functional import flatmap
 from .hints import Domain
-from .utils import generate_repr
 
 
 class Set(ABC, Generic[Domain]):
