@@ -14,12 +14,13 @@ from typing import (Any,
                     Tuple,
                     cast)
 
+from reprit.base import generate_repr
+
 from .base import (EMPTY_SET,
                    EMPTY_SET_STRING,
                    Set,
                    Union)
 from .discrete import DiscreteSet
-from .utils import generate_repr
 
 
 class Interval(Set[SupportsFloat]):

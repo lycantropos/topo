@@ -7,6 +7,9 @@ import topo
 
 project_base_url = 'https://github.com/lycantropos/topo/'
 
+install_requires = [
+    'reprit>=0.0.0',
+]
 setup_requires = [
     'pytest-runner>=4.2',
 ]
@@ -27,5 +30,6 @@ setup(name='topo',
       url=project_base_url,
       download_url=project_base_url + 'archive/master.zip',
       python_requires='>=3.5',
+      install_requires=install_requires,
       setup_requires=setup_requires,
       tests_require=tests_require)

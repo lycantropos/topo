@@ -1,6 +1,7 @@
+from reprit.base import generate_repr
+
 from .base import Set
 from .hints import Domain
-from .utils import generate_repr
 
 
 class DiscreteSet(Set[Domain]):
