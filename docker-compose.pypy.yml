@@ -7,7 +7,7 @@ services:
       args:
       - PYTHON_IMAGE=${PYPY_IMAGE_NAME}
       - PYTHON_IMAGE_VERSION=${PYPY_IMAGE_VERSION}
-    image: lycantropos/topo-pypy:0.1.0
+    image: lycantropos/topo-pypy:0.1.1
     volumes:
       - ./topo/:/opt/topo/topo/
       - ./tests/:/opt/topo/tests/

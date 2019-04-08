@@ -17,7 +17,7 @@ class DiscreteSet(Set[Domain]):
     __repr__ = generate_repr(__init__)
 
     def __str__(self) -> str:
-        return '{' + ', '.join(map(repr, self.points)) + '}'
+        return '{' + ', '.join(map(str, self.points)) + '}'
 
     def __and__(self, other: Set) -> Set:
         if not isinstance(other, Set):
